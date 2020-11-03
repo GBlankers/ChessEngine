@@ -1,17 +1,4 @@
 # ChessEngine
 
-Onze eigen bs chess engine
-
-let's goooooo
-
-Dit heeft Gaetan geschreven
-
-Serdar
-
-Dit is Vlad
-
-wat ben je aant doen? 
-
-halloo conflict
-
-Ik ben in de Gaetan Branch aan het werken
+<h4>Chess engine voor het vak 5-AI</h4>
+We maken hier gebruik van het <b><a href="https://en.wikipedia.org/wiki/Minimax"> minimax algoritme</a></b>
