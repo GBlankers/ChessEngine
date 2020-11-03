@@ -4,4 +4,4 @@ Onze eigen bs chess engine
 
 let's goooooo
 
-Serdar
+Dit heeft Gaetan geschreven
