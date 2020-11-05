@@ -2,6 +2,7 @@
 import chess
 import chess.engine
 from searchagent.search_agent import SearchAgent
+from searchagent.search_agent import utility
 
 
 def main():
@@ -15,9 +16,9 @@ def main():
 
     while running:
         move = None
-
+        print(utility(board))
         if turn_white_player:
-            move = white_player.random_move(board=board)
+            move = white_player.minmax(board=board)
             turn_white_player = False
 
         else:

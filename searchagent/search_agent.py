@@ -1,5 +1,6 @@
 import random
 import chess
+from . import util
 
 
 class SearchAgent(object):
@@ -8,7 +9,6 @@ class SearchAgent(object):
         """Setup the Search Agent"""
         self.time_limit = time_limit
         self.name = "Chess Engine"
-        self.author = "S. Vanneste"
 
     def random_move(self, board: chess.Board):
         return random.sample(list(board.legal_moves), 1)[0]
@@ -43,3 +43,55 @@ class SearchAgent(object):
                     best_move = move
 
         return best_move
+
+    def minmax(self, board: chess.Board, depth=2):
+        moves = list(board.legal_moves)
+        moveUtility = util.Counter()
+
+        for move in moves:
+            moveUtility[move] = minmize(board, depth-1)
+        return moveUtility.argMax()
+
+
+def minmize(board: chess.Board, depth):
+
+    # Indien we op max diepte zitten, returnen we de utility waarde van deze board state
+    if depth == 0:
+        return utility(board)
+
+    moveUtility = util.Counter()
+    for Nmove in board.legal_moves:
+        workBoard = board
+        workBoard.push(Nmove)
+        moveUtility[Nmove] = maximize(workBoard, depth-1)
+        workBoard.pop()
+
+    return moveUtility[moveUtility.argMin()]
+
+
+def maximize(board: chess.Board, depth):
+    # Indien we op max diepte zitten, returnen we de utility waarde van deze board state
+    if depth == 0:
+        return utility(board)
+
+    moveUtility = util.Counter()
+    for Nmove in board.legal_moves:
+        workBoard = board
+        workBoard.push(Nmove)
+        moveUtility[Nmove] = maximize(workBoard, depth - 1)
+        workBoard.pop()
+
+    return moveUtility[moveUtility.argMax()]
+
+
+def utility(board: chess.Board):
+    # https://www.chessprogramming.org/Evaluation
+
+    f = 200 * (len(board.pieces(chess.KING, True)) - len(board.pieces(chess.KING, False))) +\
+        9 * (len(board.pieces(chess.QUEEN, True)) - len(board.pieces(chess.QUEEN, False))) +\
+        5 * (len(board.pieces(chess.ROOK, True)) - len(board.pieces(chess.ROOK, False))) +\
+        3 * (len(board.pieces(chess.BISHOP, True)) - len(board.pieces(chess.BISHOP, False)) +
+             len(board.pieces(chess.KNIGHT, True)) - len(board.pieces(chess.KNIGHT, False))) +\
+        (len(board.pieces(chess.PAWN, True)) - len(board.pieces(chess.PAWN, False)))
+
+    return f
