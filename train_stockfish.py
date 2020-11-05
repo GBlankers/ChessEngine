@@ -16,14 +16,17 @@ def main():
 
     while running:
         move = None
-        print(utility(board))
+
         if turn_white_player:
             move = white_player.minmax(board=board)
             turn_white_player = False
-
+            print("Engine")
+            print("Utility: " + utility(board, 1))
         else:
             move = black_player.play(board, limit).move
             turn_white_player = True
+            print("Stockfish")
+            print("Utility: " + utility(board, 0))
 
         board.push(move)
         print(board)
@@ -33,6 +36,7 @@ def main():
             running = False
 
             if turn_white_player:
+                print(utility(board, 0))
                 print("Stockfish wins!")
             else:
                 print("{} wins!".format(white_player.name))

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import chess
 from searchagent.search_agent import SearchAgent
+from searchagent.search_agent import utility
 
 
 def run_episode():
@@ -19,15 +20,17 @@ def run_episode():
         move = None
 
         if turn_white_player:
-            move = white_player.random_move(board=board)
+            move = white_player.minmax(board=board)
             turn_white_player = False
             print("white")
+            print(utility(board, 1))
 
         else:
             # move = black_player.random_move(board=board)
             move = black_player.random_with_first_level_search(board=board)
             turn_white_player = True
             print("Black")
+            print(utility(board, 0))
 
         board.push(move)
         print(board)
