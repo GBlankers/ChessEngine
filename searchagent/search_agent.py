@@ -9,7 +9,6 @@ class SearchAgent(object):
         self.time_limit = time_limit
         self.name = "Chess Engine"
         self.author = "GB"
-        self.depth = 5
 
     def random_move(self, board: chess.Board):
         return random.sample(list(board.legal_moves), 1)[0]
@@ -46,7 +45,6 @@ class SearchAgent(object):
         return best_move
 
     # Depth ook bij self.depth aanpassen voor juiste werking
-    # TODO ALFA_BETA pruning
     def minmax(self, board: chess.Board, depth=5, player=1):
         moves = list(board.legal_moves)
         # Kopie van het bord zodat moves niet "echt" uitgevoerd worden
@@ -98,7 +96,7 @@ class SearchAgent(object):
         else:
             return maxValue
 
-    def minimax_alfa_beta(self, board: chess.Board, alfa, beta, depth=5, player=1):
+    def minimax_alfa_beta(self, board: chess.Board, alfa=float('-inf'), beta=float('inf'), depth=4, player=1):
         moves = list(board.legal_moves)
         # Kopie van het bord zodat moves niet "echt" uitgevoerd worden
         workBoard = board
@@ -109,7 +107,7 @@ class SearchAgent(object):
         maxValue = float("inf")
 
         if depth == 0 or len(moves) == 0:
-            return utility(workBoard, player)
+            return utility(workBoard, player), bestMove
 
             # Eigen speler => utility proberen maximaliseren
         if player:
@@ -118,7 +116,7 @@ class SearchAgent(object):
                 workBoard.push(move)
 
                 # Bereken utility van de move
-                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player)
+                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player)[0]
 
                 # Indien de move een betere utility geeft
                 if minValue < util:
@@ -134,6 +132,7 @@ class SearchAgent(object):
                 alfa = max([alfa, util])
                 if alfa >= beta:
                     break
+            return minValue, random.choice(bestMove)
 
         # Tegenstander => proberen de utitlity te minimaliseren
         else:
@@ -141,7 +140,7 @@ class SearchAgent(object):
 
                 workBoard.push(move)
 
-                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player)
+                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player)[0]
 
                 if maxValue > util:
                     bestMove = [move]
@@ -154,18 +153,7 @@ class SearchAgent(object):
                 beta = min([beta, util])
                 if alfa <= beta:
                     break
-
-        # Return de beste move indien we in root zitten
-        # Indien er meer mogelijke moves zijn dan zal er random 1 gekozen worden
-        if depth == self.depth:
-            return random.choice(bestMove)
-
-        # Return de Utility indien we niet in root zitten
-        if player:
-            return minValue
-        else:
-            return maxValue
-
+            return maxValue, random.choice(bestMove)
 
 
 # TODO Implement mobility + blocked/isolated/doubled pawns
