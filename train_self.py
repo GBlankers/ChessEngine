@@ -20,7 +20,7 @@ def run_episode():
         move = None
 
         if turn_white_player:
-            move = white_player.minmax(board=board)
+            move = white_player.minimax_alfa_beta(board=board, alfa=float('-inf'), beta=float('inf'))
             turn_white_player = False
             print("white")
             print(utility(board, 1))
@@ -34,8 +34,6 @@ def run_episode():
 
         board.push(move)
         print(board)
-        print("###########################")
-        print(board.piece_at(chess.QUEEN))
         print("###########################")
 
         if board.is_checkmate():

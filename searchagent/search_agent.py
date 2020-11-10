@@ -9,7 +9,6 @@ class SearchAgent(object):
         self.time_limit = time_limit
         self.name = "Chess Engine"
         self.author = "GB"
-        self.depth = 4
 
     def random_move(self, board: chess.Board):
         return random.sample(list(board.legal_moves), 1)[0]
@@ -46,8 +45,7 @@ class SearchAgent(object):
         return best_move
 
     # Depth ook bij self.depth aanpassen voor juiste werking
-    # TODO ALFA_BETA pruning
-    def minmax(self, board: chess.Board, depth=4, player=1):
+    def minmax(self, board: chess.Board, depth=5, player=1):
         moves = list(board.legal_moves)
         # Kopie van het bord zodat moves niet "echt" uitgevoerd worden
         workBoard = board
@@ -97,6 +95,65 @@ class SearchAgent(object):
             return minValue
         else:
             return maxValue
+
+    def minimax_alfa_beta(self, board: chess.Board, alfa=float('-inf'), beta=float('inf'), depth=4, player=1):
+        moves = list(board.legal_moves)
+        # Kopie van het bord zodat moves niet "echt" uitgevoerd worden
+        workBoard = board
+        bestMove = None
+
+        # Moves vergelijken met de slechts mogelijke waarde
+        minValue = float("-inf")
+        maxValue = float("inf")
+
+        if depth == 0 or len(moves) == 0:
+            return utility(workBoard, player), bestMove
+
+            # Eigen speler => utility proberen maximaliseren
+        if player:
+            for move in moves:
+                # Voer de huidige move uit op de kopie van het bord
+                workBoard.push(move)
+
+                # Bereken utility van de move
+                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player)[0]
+
+                # Indien de move een betere utility geeft
+                if minValue < util:
+                    bestMove = [move]
+                    minValue = util
+                # Indien de move dezelfde utility heeft
+                elif minValue == util:
+                    bestMove.append(move)
+
+                # Undo de move
+                workBoard.pop()
+
+                alfa = max([alfa, util])
+                if alfa >= beta:
+                    break
+            return minValue, random.choice(bestMove)
+
+        # Tegenstander => proberen de utitlity te minimaliseren
+        else:
+            for move in moves:
+
+                workBoard.push(move)
+
+                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player)[0]
+
+                if maxValue > util:
+                    bestMove = [move]
+                    maxValue = util
+                elif maxValue == util:
+                    bestMove.append(move)
+
+                workBoard.pop()
+
+                beta = min([beta, util])
+                if alfa <= beta:
+                    break
+            return maxValue, random.choice(bestMove)
 
 
 # TODO Implement mobility + blocked/isolated/doubled pawns

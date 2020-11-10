@@ -18,7 +18,7 @@ def main():
         move = None
 
         if turn_white_player:
-            move = white_player.minmax(board=board)
+            move = white_player.minimax_alfa_beta(board=board, alfa=float('-inf'), beta=float('inf'))[1]
             turn_white_player = False
             print("Engine")
             print("Utility: " + str(utility(board, 1)))
