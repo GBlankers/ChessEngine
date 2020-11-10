@@ -45,57 +45,76 @@ class SearchAgent(object):
 
         return best_move
 
+    # Depth ook bij self.depth aanpassen voor juiste werking
+    # TODO ALFA_BETA pruning
     def minmax(self, board: chess.Board, depth=4, player=1):
         moves = list(board.legal_moves)
+        # Kopie van het bord zodat moves niet "echt" uitgevoerd worden
         workBoard = board
+        bestMove = None
+
+        # Moves vergelijken met de slechts mogelijke waarde
+        minValue = float("-inf")
+        maxValue = float("inf")
 
         if depth == 0 or len(moves) == 0:
             return utility(board, player)
 
+        # Eigen speler => utility proberen maximaliseren
         if player:
-            minValue = float("-inf")
-
             for move in moves:
+                # Voer de huidige move uit op de kopie van het bord
                 workBoard.push(move)
-                temp = self.minmax(workBoard, depth-1, not player)
-                if minValue < temp:
-                    minValue = temp
-                    bestMove = move
+                util = self.minmax(workBoard, depth-1, not player)
+                # Indien de move een betere utility geeft
+                if minValue < util:
+                    bestMove = [move]
+                    minValue = util
+                # Indien de move dezelfde utility heeft
+                elif minValue == util:
+                    bestMove.append(move)
+                # Undo de move
                 workBoard.pop()
+        # Tegenstander => proberen de utitlity te minimaliseren
         else:
-            maxValue = float("inf")
-
             for move in moves:
                 workBoard.push(move)
-                temp = self.minmax(workBoard, depth - 1, not player)
-                if maxValue > temp:
-                    maxValue = temp
-                    bestMove = move
+                util = self.minmax(workBoard, depth - 1, not player)
+                if maxValue > util:
+                    bestMove = [move]
+                    maxValue = util
+                elif maxValue == util:
+                    bestMove.append(move)
                 workBoard.pop()
 
+        # Return de beste move indien we in root zitten
+        # Indien er meer mogelijke moves zijn dan zal er random 1 gekozen worden
         if depth == self.depth:
-            return bestMove
+            return random.choice(bestMove)
 
+        # Return de Utility indien we niet in root zitten
         if player:
             return minValue
         else:
             return maxValue
 
 
+# TODO Implement mobility + blocked/isolated/doubled pawns
 def utility(board: chess.Board, player):
     # https://www.chessprogramming.org/Evaluation
 
     if board.is_checkmate():
         if player:
-            return 99999
+            return 9999999
         else:
-            return -99999
+            return -9999999
 
-    f = 200 * (len(board.pieces(chess.KING, True)) - len(board.pieces(chess.KING, False))) +\
+    # Number of pieces
+    n = 200 * (len(board.pieces(chess.KING, True)) - len(board.pieces(chess.KING, False))) +\
         9 * (len(board.pieces(chess.QUEEN, True)) - len(board.pieces(chess.QUEEN, False))) +\
         5 * (len(board.pieces(chess.ROOK, True)) - len(board.pieces(chess.ROOK, False))) +\
         3 * (len(board.pieces(chess.BISHOP, True)) - len(board.pieces(chess.BISHOP, False)) +
              len(board.pieces(chess.KNIGHT, True)) - len(board.pieces(chess.KNIGHT, False))) +\
         (len(board.pieces(chess.PAWN, True)) - len(board.pieces(chess.PAWN, False)))
 
-    return f
+    return n

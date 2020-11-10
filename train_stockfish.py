@@ -21,12 +21,12 @@ def main():
             move = white_player.minmax(board=board)
             turn_white_player = False
             print("Engine")
-            print("Utility: " + utility(board, 1))
+            print("Utility: " + str(utility(board, 1)))
         else:
             move = black_player.play(board, limit).move
             turn_white_player = True
             print("Stockfish")
-            print("Utility: " + utility(board, 0))
+            print("Utility: " + str(utility(board, 0)))
 
         board.push(move)
         print(board)
