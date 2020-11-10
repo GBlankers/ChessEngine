@@ -48,7 +48,7 @@ def main():
 
             elif input_val[0] == "go" and \
                     input_val[1] == "movetime":
-                print("bestmove {}".format(player.random_with_first_level_search(board).uci()))
+                print("bestmove {}".format(player.minmax(board).uci()))
 
             else:
                 print("error command: {}".format(input_val))

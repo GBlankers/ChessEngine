@@ -17,7 +17,7 @@ def main():
         move = None
 
         if turn_white_player:
-            move = white_player.random_move(board=board)
+            move = white_player.minmax(board=board)
             turn_white_player = False
 
         else:
