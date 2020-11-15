@@ -48,10 +48,10 @@ def main():
 
             elif input_val[0] == "go" and \
                     input_val[1] == "movetime":
-                print("bestmove {}".format(player.minimax_alfa_beta(board, depth=3, alfa=float('-inf'), beta=float('inf'))[1].uci()))
+                print("bestmove {}".format(player.minimax_alfa_beta(board, depth=3)[1].uci()))
 
             elif input_val[0] == "go" and input_val[1] == "depth":
-                print("bestmove {}".format(player.minimax_alfa_beta(board, depth=int(input_val[2]), alfa=float('-inf'), beta=float('inf'))[1].uci()))
+                print("bestmove {}".format(player.minimax_alfa_beta(board, depth=int(input_val[2]))[1].uci()))
 
             else:
                 print("error command: {}".format(input_val))

@@ -20,17 +20,17 @@ def run_episode():
         move = None
 
         if turn_white_player:
-            move = white_player.minimax_alfa_beta(board=board, alfa=float('-inf'), beta=float('inf'))
+            move = white_player.minimax_alfa_beta(board=board, depth= 5, alfa=float('-inf'), beta=float('inf'))[1]
             turn_white_player = False
             print("white")
-            print(utility(board, 1))
+            print(utility(board))
 
         else:
-            # move = black_player.random_move(board=board)
-            move = black_player.random_with_first_level_search(board=board)
+            move = black_player.random_move(board=board)
+            # move = black_player.minimax_alfa_beta(board=board, depth=4, player=0)[1]
             turn_white_player = True
             print("Black")
-            print(utility(board, 0))
+            print(utility(board))
 
         board.push(move)
         print(board)
