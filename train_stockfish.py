@@ -19,7 +19,6 @@ def main():
 
         if turn_white_player:
             move = white_player.minimax_alfa_beta(board=board, alfa=float('-inf'), beta=float('inf'))[1]
-            print(move)
             turn_white_player = False
             print("Engine")
         else:

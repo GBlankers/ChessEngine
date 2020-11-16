@@ -20,7 +20,7 @@ def run_episode():
         move = None
 
         if turn_white_player:
-            move = white_player.minimax_alfa_beta(board=board, depth= 5, alfa=float('-inf'), beta=float('inf'))[1]
+            move = white_player.minimax_alfa_beta(board=board, depth=5, alfa=float('-inf'), beta=float('inf'))[1]
             turn_white_player = False
             print("white")
             print(utility(board))

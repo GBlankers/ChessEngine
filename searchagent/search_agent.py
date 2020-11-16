@@ -12,7 +12,8 @@ class SearchAgent(object):
         self.author = "GB"
         self.moves = -1
         self.openings = openings
-        self.openingNumber = random.randint(0, len(self.openings))
+        self.openingNumber = random.randint(0, len(self.openings)-1)
+        self.visited = {}
 
     def random_move(self, board: chess.Board):
         return random.sample(list(board.legal_moves), 1)[0]
@@ -97,9 +98,14 @@ class SearchAgent(object):
 
                 return maxValue, bestMove
 
-    # TODO iterative deepening
-    def minimax_alfa_beta(self, board: chess.Board, alfa=float('-inf'), beta=float('inf'), depth=5, player=1):
+    def minimax_alfa_beta(self, board: chess.Board, alfa=float('-inf'), beta=float('inf'), depth=5, player=1, root=True):
         moves = list(board.legal_moves)
+
+        # At root
+        if root:
+            self.visited = {}
+            root = False
+
         # Kopie van het bord zodat moves niet "echt" uitgevoerd worden
         workBoard = board
         bestMove = [None]
@@ -108,37 +114,48 @@ class SearchAgent(object):
         minValue = float("-inf")
         maxValue = float("inf")
 
-        # Use some known good openings the first moves
+        # Bekende openings gebruiken als eerste moves
         if self.moves < len(self.openings[self.openingNumber])-1:
             self.moves = self.moves + 1
             return 0, chess.Move.from_uci(self.openings[self.openingNumber][self.moves])
 
+        # Bereken utility als we een bepaalde diepte hebben bereikt of als er geen moves te maken vallen
         if depth == 0 or len(moves) == 0:
             return utility(workBoard), bestMove
 
-            # Eigen speler => utility proberen maximaliseren
+        # Eigen speler => utility proberen maximaliseren
         if player:
             for move in moves:
                 # Voer de huidige move uit op de kopie van het bord
                 workBoard.push(move)
 
-                # Bereken utility van de move
-                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player)[0]
+                # Hebben we deze state al gezien?
+                if workBoard.fen() not in self.visited:
+                    # Bereken utility van de move
+                    util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player, root)[0]
 
-                # Indien de move een betere utility geeft
-                if minValue < util:
+                    # Stop deze in visited
+                    self.visited[workBoard.fen()] = util
+
+                    # Undo de move
+                    workBoard.pop()
+
+                    # Indien de move een betere utility geeft
+                    if minValue < util:
+                        bestMove = [move]
+                        minValue = util
+                    # Indien de move dezelfde utility heeft
+                    elif minValue == util:
+                        bestMove.append(move)
+
+                    alfa = max([alfa, util])
+                    if alfa >= beta:
+                        break
+                else:
+                    minValue = self.visited[workBoard.fen()]
                     bestMove = [move]
-                    minValue = util
-                # Indien de move dezelfde utility heeft
-                elif minValue == util:
-                    bestMove.append(move)
+                    workBoard.pop()
 
-                # Undo de move
-                workBoard.pop()
-
-                alfa = max([alfa, util])
-                if alfa >= beta:
-                    break
             return minValue, random.choice(bestMove)
 
         # Tegenstander => proberen de utitlity te minimaliseren
@@ -147,19 +164,28 @@ class SearchAgent(object):
 
                 workBoard.push(move)
 
-                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player)[0]
+                if workBoard.fen() not in self.visited:
 
-                if maxValue > util:
+                    util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player, root)[0]
+
+                    self.visited[workBoard.fen()] = util
+
+                    if maxValue > util:
+                        bestMove = [move]
+                        maxValue = util
+                    elif maxValue == util:
+                        bestMove.append(move)
+
+                    workBoard.pop()
+
+                    beta = min([beta, util])
+                    if alfa <= beta:
+                        break
+                else:
+                    maxValue = self.visited[workBoard.fen()]
                     bestMove = [move]
-                    maxValue = util
-                elif maxValue == util:
-                    bestMove.append(move)
+                    workBoard.pop()
 
-                workBoard.pop()
-
-                beta = min([beta, util])
-                if alfa <= beta:
-                    break
             return maxValue, random.choice(bestMove)
 
 
@@ -175,13 +201,15 @@ def utility(board: chess.Board):
     if board.is_stalemate():
         return 0
 
-    MS = materialScore(board)
+    return materialScore(board)
 
-    PS = pawnStructure(board)
-
-    BC = boardControl(board)
-
-    return MS - 0.5 * PS + BC
+    # MS = materialScore(board)
+    #
+    # PS = pawnStructure(board)
+    #
+    # BC = boardControl(board)
+    #
+    # return MS - 0.5 * PS + BC
 
 
 # Functions for utility
