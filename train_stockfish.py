@@ -21,14 +21,13 @@ def main():
             move = white_player.minimax_alfa_beta(board=board, alfa=float('-inf'), beta=float('inf'))[1]
             turn_white_player = False
             print("Engine")
-            print("Utility: " + str(utility(board, 1)))
         else:
             move = black_player.play(board, limit).move
             turn_white_player = True
             print("Stockfish")
-            print("Utility: " + str(utility(board, 0)))
 
         board.push(move)
+        print("Utility: " + str(utility(board)))
         print(board)
         print("###########################")
 
@@ -36,7 +35,6 @@ def main():
             running = False
 
             if turn_white_player:
-                print(utility(board, 0))
                 print("Stockfish wins!")
             else:
                 print("{} wins!".format(white_player.name))

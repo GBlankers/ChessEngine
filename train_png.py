@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import chess.pgn
 
+
 def main():
     # get from https://raw.githubusercontent.com/niklasf/python-chess/master/data/pgn/kasparov-deep-blue-1997.pgn
     pgn = open("data/kasparov-deep-blue-1997.pgn")
