@@ -9,7 +9,8 @@ class SearchAgent(object):
         """Setup the Search Agent"""
         self.time_limit = time_limit
         self.name = "Chess Engine"
-        self.author = "GB"
+        self.author = "Groep2"
+
         self.moves = -1
         self.openings = openings
         self.openingNumber = random.randint(0, len(self.openings)-1)
@@ -115,7 +116,7 @@ class SearchAgent(object):
         maxValue = float("inf")
 
         # Bekende openings gebruiken als eerste moves
-        if self.moves < len(self.openings[self.openingNumber])-1:
+        if self.moves < len(self.openings[self.openingNumber])-1 and board.turn:
             self.moves = self.moves + 1
             return 0, chess.Move.from_uci(self.openings[self.openingNumber][self.moves])
 
@@ -201,15 +202,15 @@ def utility(board: chess.Board):
     if board.is_stalemate():
         return 0
 
-    return materialScore(board)
+    # return materialScore(board)
 
-    # MS = materialScore(board)
-    #
-    # PS = pawnStructure(board)
-    #
-    # BC = boardControl(board)
-    #
-    # return MS - 0.5 * PS + BC
+    MS = materialScore(board)
+
+    PS = pawnStructure(board)
+
+    BC = boardControl(board)
+
+    return MS - 0.5 * PS + 0.5 * BC
 
 
 # Functions for utility
@@ -294,7 +295,6 @@ def pawnStructure(board: chess.Board):
                     break
         if isolated:
             Iacc = Iacc + 1
-
 
     # Blocked
     B = 0
