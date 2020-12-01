@@ -14,6 +14,7 @@ class SearchAgent(object):
         self.moves = -1
         self.openings = openings
         self.openingNumber = random.randint(0, len(self.openings)-1)
+        self.visited = {}
 
     def random_move(self, board: chess.Board):
         return random.sample(list(board.legal_moves), 1)[0]
@@ -101,6 +102,11 @@ class SearchAgent(object):
     def minimax_alfa_beta(self, board: chess.Board, alfa=float('-inf'), beta=float('inf'), depth=5, player=1, root=True):
         moves = list(board.legal_moves)
 
+        # At root
+        if root:
+            self.visited = {}
+            root = False
+
         # Kopie van het bord zodat moves niet "echt" uitgevoerd worden
         workBoard = board
         bestMove = [None]
@@ -124,23 +130,32 @@ class SearchAgent(object):
                 # Voer de huidige move uit op de kopie van het bord
                 workBoard.push(move)
 
-                # Bereken utility van de move
-                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player, root)[0]
+                # Hebben we deze state al gezien?
+                if workBoard.fen() not in self.visited:
+                    # Bereken utility van de move
+                    util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player, root)[0]
 
-                # Undo de move
-                workBoard.pop()
+                    # Stop deze in visited
+                    self.visited[workBoard.fen()] = util
 
-                # Indien de move een betere utility geeft
-                if minValue < util:
+                    # Undo de move
+                    workBoard.pop()
+
+                    # Indien de move een betere utility geeft
+                    if minValue < util:
+                        bestMove = [move]
+                        minValue = util
+                    # Indien de move dezelfde utility heeft
+                    elif minValue == util:
+                        bestMove.append(move)
+
+                    alfa = max([alfa, util])
+                    if alfa >= beta:
+                        break
+                else:
+                    minValue = self.visited[workBoard.fen()]
                     bestMove = [move]
-                    minValue = util
-                # Indien de move dezelfde utility heeft
-                elif minValue == util:
-                    bestMove.append(move)
-
-                alfa = max([alfa, util])
-                if alfa >= beta:
-                    break
+                    workBoard.pop()
 
             return minValue, random.choice(bestMove)
 
@@ -150,19 +165,27 @@ class SearchAgent(object):
 
                 workBoard.push(move)
 
-                util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player, root)[0]
+                if workBoard.fen() not in self.visited:
 
-                if maxValue > util:
+                    util = self.minimax_alfa_beta(workBoard, alfa, beta, depth - 1, not player, root)[0]
+
+                    self.visited[workBoard.fen()] = util
+
+                    if maxValue > util:
+                        bestMove = [move]
+                        maxValue = util
+                    elif maxValue == util:
+                        bestMove.append(move)
+
+                    workBoard.pop()
+
+                    beta = min([beta, util])
+                    if alfa <= beta:
+                        break
+                else:
+                    maxValue = self.visited[workBoard.fen()]
                     bestMove = [move]
-                    maxValue = util
-                elif maxValue == util:
-                    bestMove.append(move)
-
-                workBoard.pop()
-
-                beta = min([beta, util])
-                if alfa <= beta:
-                    break
+                    workBoard.pop()
 
             return maxValue, random.choice(bestMove)
 
