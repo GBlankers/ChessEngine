@@ -99,22 +99,26 @@ class SearchAgent(object):
                 return maxValue, bestMove
 
     def minimax_alfa_beta(self, board: chess.Board, alfa=float('-inf'), beta=float('inf'), depth=5, player=1, root=True):
+        # krijg een lijst met alle mogelijke moves
         moves = list(board.legal_moves)
 
-        # Kopie van het bord zodat moves niet "echt" uitgevoerd worden
+        # Kopie van het bord zodat mogelijke moves niet "echt" uitgevoerd worden
         workBoard = board
+        # In het begin hebben we noge geen beste move
+        # Steek de beste moves in een array, als we dan meerdere beste moves hebben dan kan er random 1 gekozen worden
         bestMove = [None]
 
         # Moves vergelijken met de slechts mogelijke waarde
         minValue = float("-inf")
         maxValue = float("inf")
 
-        # Bekende openings gebruiken als eerste moves
+        # Bekende openings gebruiken als eerste moves en enkel als we met wit spelen
         if self.moves < len(self.openings[self.openingNumber])-1 and board.turn:
             self.moves = self.moves + 1
             return 0, chess.Move.from_uci(self.openings[self.openingNumber][self.moves])
 
         # Bereken utility als we een bepaalde diepte hebben bereikt of als er geen moves te maken vallen
+        # Geef de beste move mee => zal leeg zijn op depth==0 => we moeten de moves niet weten op depth ==0
         if depth == 0 or len(moves) == 0:
             return utility(workBoard), bestMove
 
@@ -138,8 +142,10 @@ class SearchAgent(object):
                 elif minValue == util:
                     bestMove.append(move)
 
+                # Alfa-beta pruning
                 alfa = max([alfa, util])
                 if alfa >= beta:
+                    # stop de for loop
                     break
 
             return minValue, random.choice(bestMove)
@@ -191,6 +197,7 @@ def utility(board: chess.Board):
 
 
 # Functions for utility
+# Stukken die verder op het bord staan krijgen meer waarde
 def boardControl(board: chess.Board):
     allPieces = [chess.PAWN, chess.ROOK, chess.QUEEN, chess.KING, chess.BISHOP, chess.KNIGHT]
 
@@ -211,6 +218,7 @@ def boardControl(board: chess.Board):
     return M - Macc
 
 
+# rekening houden met blocked, isolated en doubled pawns + pawns die verder op het bord staan
 def pawnStructure(board: chess.Board):
     playerPawn = list(board.pieces(chess.PAWN, True))
     enemyPawn = list(board.pieces(chess.PAWN, False))
