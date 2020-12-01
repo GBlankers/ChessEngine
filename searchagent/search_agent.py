@@ -202,15 +202,15 @@ def utility(board: chess.Board):
     if board.is_stalemate():
         return 0
 
-    return materialScore(board)
+    # return materialScore(board)
 
-    # MS = materialScore(board)
-    #
-    # PS = pawnStructure(board)
-    #
-    # BC = boardControl(board)
-    #
-    # return MS - 0.5 * PS + 0.5 * BC
+    MS = materialScore(board)
+
+    PS = pawnStructure(board)
+
+    BC = boardControl(board)
+
+    return MS - 0.5 * PS + 0.5 * BC
 
 
 # Functions for utility
