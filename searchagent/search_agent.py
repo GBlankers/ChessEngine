@@ -122,7 +122,7 @@ class SearchAgent(object):
         if depth == 0 or len(moves) == 0:
             return utility(workBoard), bestMove
 
-        # Eigen speler => utility proberen maximaliseren
+        # Eigen speler, wit => utility proberen maximaliseren
         if player:
             for move in moves:
                 # Voer de huidige move uit op de kopie van het bord
@@ -150,7 +150,7 @@ class SearchAgent(object):
 
             return minValue, random.choice(bestMove)
 
-        # Tegenstander => proberen de utitlity te minimaliseren
+        # Tegenstander, zwart => proberen de utitlity te minimaliseren
         else:
             for move in moves:
 
@@ -234,8 +234,8 @@ def pawnStructure(board: chess.Board):
                 (x + 32 in playerPawn) or (x + 40 in playerPawn):
             D = D + 1
     for x in enemyPawn:
-        if (x + 8 in enemyPawn) or (x + 16 in enemyPawn) or (x + 24 in enemyPawn) or \
-                (x + 32 in enemyPawn) or (x + 40 in enemyPawn):
+        if (x - 8 in enemyPawn) or (x - 16 in enemyPawn) or (x - 24 in enemyPawn) or \
+                (x - 32 in enemyPawn) or (x - 40 in enemyPawn):
             Dacc = Dacc + 1
 
     # Isolated
