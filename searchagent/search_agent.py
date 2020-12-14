@@ -205,13 +205,12 @@ def boardControl(board: chess.Board):
     Macc = 0
 
     for x in allPieces:
-        temp = list(board.pieces(x, True))
-        for y in temp:
+        # If the white pieces are above the 2nd row
+        for y in list(board.pieces(x, True)):
             if y > 15:
                 M = M + 1
-
-        temp = list(board.pieces(x, False))
-        for y in temp:
+        # If the black pieces are under the 7th row
+        for y in list(board.pieces(x, False)):
             if y < 48:
                 Macc = Macc + 1
 
@@ -305,7 +304,6 @@ def pawnStructure(board: chess.Board):
 
     for x in playerPawn:
         F = F + x % 8
-
     for x in enemyPawn:
         Facc = Facc + x % 8
 
